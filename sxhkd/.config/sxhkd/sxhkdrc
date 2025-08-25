@@ -1,0 +1,14 @@
+
+super + {1 - 9}
+    i3-msg workspace {1-9}
+
+
+super + {1 - 9}
+    i3-msg workspace 1{1 - 9}
+
+super + shift + {1 - 9}
+    i3-msg move container to workspace number {1-9}
+
+super + shift + {1 - 9}
+    i3-msg move container to workspace number 1{1 - 9}
+
