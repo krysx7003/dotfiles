@@ -5,7 +5,7 @@ exec --no-startup-id xrandr --output HDMI-1-0 --auto --right-of HDMI-2 --pos 192
 
 # exec_always --no-startup-id killall polybar
 # exec_always --no-startup-id ~/.config/polybar/launch_polybar.sh
-exec_always feh --bg-scale ~/.config/kuma.jpeg
+exec_always feh --bg-scale ~/.config/bg/1356513.jpeg
 
 set $fm HDMI-2
 set $sm HDMI-1-0
@@ -34,7 +34,11 @@ font pango:monospace 10
 
 exec --no-startup-id dex --autostart --environment i3
 
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+exec --no-startup-id xset s off
+exec --no-startup-id xset -dpms
+exec --no-startup-id xset s noblank
+
+exec --no-startup-id xautolock -time 60 -locker "dm-tool switch-to-greeter" -detectsleep
 
 exec --no-startup-id nm-applet
 
