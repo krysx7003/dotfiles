@@ -1,6 +1,5 @@
 -- NEAR FUTURE
 -- When opening file do not create .nvim
--- Add logging to chronos
 -- Switch colors when switching tmux modes
 -- NOT SO IMPORTANT
 -- Recolor the living shit out of the color sheme nappingfox.lua
