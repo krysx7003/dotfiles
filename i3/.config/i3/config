@@ -42,6 +42,8 @@ assign [class="^steam$"] → 12
 assign [class="^discord$"] → 2
 assign [class="^firefox$"] → 1
 
+for_window [class="^Nap_Nap.*"] floating enable
+
 set $refresh_i3status killall -SIGUSR1 i3status
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
