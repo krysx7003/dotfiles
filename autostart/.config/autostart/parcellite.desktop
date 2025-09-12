@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Parcellite Clipboard Manager
+Exec=parcellite -d
+Comment=Clipboard manager with history and synchronization
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=2
+Categories=Utility;

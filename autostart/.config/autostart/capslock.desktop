@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Disable CapsLock
+Exec=xmodmap -e 'keysym Caps_Lock = '
+X-GNOME-Autostart-enabled=true
