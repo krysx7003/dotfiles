@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WIRED_IF="eth0"
+WIRED_IF="eno1"
 WIRELESS_IF="wlp0s20f3"
 
 if ip link show $WIRED_IF 2>/dev/null | grep -q "state UP"; then
