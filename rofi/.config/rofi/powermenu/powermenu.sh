@@ -15,36 +15,37 @@ theme='style-5'
 
 # CMDs
 uptime="`uptime -p | sed -e 's/up //g'`"
-host=`hostname`
 
 # Options
-shutdown=' Shutdown'
-reboot=' Reboot'
-lock=' Lock'
-suspend=' Suspend'
-logout='󰍃 Logout'
-yes=' Yes'
-no=' No'
+shutdown='󰐥'
+reboot='󰜉'
+lock=''
+suspend='󰒲'
+logout='󰍃'
+yes=''
+no=''
 
 # Rofi CMD
 rofi_cmd() {
+    xdotool mousemove 960 540 &&
 	rofi -dmenu \
-		-p "$host" \
 		-mesg "Uptime: $uptime" \
 		-theme ${dir}/${theme}.rasi
 }
 
 # Confirmation CMD
 confirm_cmd() {
+    xdotool mousemove 960 540 &&
 	rofi -theme-str 'window {location: center; anchor: center; fullscreen: false; width: 250px;}' \
 		-theme-str 'mainbox {children: [ "message", "listview" ];}' \
 		-theme-str 'listview {columns: 2; lines: 1;}' \
 		-theme-str 'element-text {horizontal-align: 0.5;}' \
-		-theme-str 'textbox {horizontal-align: 0.5;}' \
+		-theme-str 'textbox {font: "FiraMono Nerd Font 14";horizontal-align: 0.5;}' \
 		-dmenu \
 		-p 'Confirmation' \
 		-mesg 'Are you Sure?' \
-		-theme ${dir}/${theme}.rasi
+		-theme ${dir}/${theme}.rasi \
+        -selected-row 0
 }
 
 # Ask for confirmation
