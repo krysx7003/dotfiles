@@ -8,5 +8,5 @@
  **/
 
 * {
-    font: "FiraMono Nerd Font 24";
+    font: "FiraMono Nerd Font 14";
 }

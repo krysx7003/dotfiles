@@ -8,6 +8,7 @@ return {
 	},
 	config = function()
 		require("dap-python").setup("venv/bin/python3")
+		--pip install debugpy
 
 		local dap = require("dap")
 		local dapui = require("dapui")

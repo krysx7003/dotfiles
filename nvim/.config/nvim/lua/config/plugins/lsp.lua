@@ -23,7 +23,7 @@ return {
 				filetypes = { "cpp" },
 			})
 
-			require("lspconfig").kotlin_language_server.setup({
+			require("lspconfig").kotlinlsp.setup({
 				filetypes = { "kotlin", "kt", "kts" },
 			})
 

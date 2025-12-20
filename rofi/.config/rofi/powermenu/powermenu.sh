@@ -40,7 +40,7 @@ confirm_cmd() {
 		-theme-str 'mainbox {children: [ "message", "listview" ];}' \
 		-theme-str 'listview {columns: 2; lines: 1;}' \
 		-theme-str 'element-text {horizontal-align: 0.5;}' \
-		-theme-str 'textbox {font: "FiraMono Nerd Font 14";horizontal-align: 0.5;}' \
+		-theme-str 'textbox {font: "FiraMono Nerd Font 10";horizontal-align: 0.5;}' \
 		-dmenu \
 		-p 'Confirmation' \
 		-mesg 'Are you Sure?' \
