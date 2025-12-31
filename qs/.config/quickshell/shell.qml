@@ -176,6 +176,10 @@ PanelWindow {
         Component.onCompleted: running = true
     }
      
+    Process {
+        id: setVolumeProc
+        command: ["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", (root.volume / 100.0).toFixed(2)]
+    }
 
     Timer {
         interval: 2000
@@ -184,8 +188,16 @@ PanelWindow {
         onTriggered: {
             cpuProc.running = true
             memProc.running = true
-            wifiProc.running = true
             batteryProc.running = true 
+        }
+    }
+
+    Timer {
+        interval: 500
+        running: true
+        repeat: true
+        onTriggered: {
+            wifiProc.running = true
             btProc.running = true
             volumeProc.running = true
         }
@@ -299,6 +311,7 @@ PanelWindow {
             label: "VOL "
             content: root.volume + "%"
             clickable: true
+            
             onClick: () =>{
                 focusGrab.active = true
                 root.volumeVisible = !root.volumeVisible
@@ -307,6 +320,17 @@ PanelWindow {
                 root.wifiVisible = false
                 root.btVisible = false
             } 
+            scrollable: true
+            onScroll: (wheel) => {
+                if (wheel.angleDelta.y > 0) {
+                    root.volume = Math.min(100, root.volume + 5)
+                } else {
+                    root.volume = Math.max(0, root.volume - 5)
+                }
+                setVolumeProc.running = true
+                 
+                wheel.accepted = true
+            }
         }
         Rectangle { width: 1; height: 14; color: root.colGrey }
 

@@ -120,11 +120,14 @@ Popup {
                     textSize: sysPopup.textSize
 
                     content: ""
-                    //Process {
-                    //    id: lockProc
-                    //    command: ["reboot"]
-                    //}
-                    onClick: () => { console.log("Implement me you lazy bum") }
+                    Process {
+                       id: lockProc
+                       command: ["hyprlock"]
+                    }
+                    onClick: () => {
+                        lockProc.running = true
+                        root.systemVisible = false
+                    }
                 }
 
                 IconText {

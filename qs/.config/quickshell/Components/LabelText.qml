@@ -3,10 +3,12 @@ import QtQuick
 import QtQuick.Layouts
 
 Rectangle {
-    property bool clickable: false
     property string label: ""
     property string content: ""
+    property bool clickable: false
     property var onClick: () => console.log(content)
+    property bool scrollable: false
+    property var onScroll: (wheel) => console.log(wheel.angleDelta.y)
     property int padding: clickable ? 10 : 0
     Layout.preferredWidth: labelText.width + contentText.width + padding
     Layout.preferredHeight: parent.height
@@ -38,6 +40,9 @@ Rectangle {
         hoverEnabled: clickable
         enabled: clickable
         onClicked: if (clickable) onClick()
+        onWheel: function(wheel) {
+            if (scrollable) onScroll(wheel)
+        }
         cursorShape: clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
     }
 }
