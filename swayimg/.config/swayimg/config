@@ -1,0 +1,9 @@
+[viewer]
+window = #000000ff
+transparency = #000000ff
+
+[info]
+show = no
+
+[font]
+color = #00000000
