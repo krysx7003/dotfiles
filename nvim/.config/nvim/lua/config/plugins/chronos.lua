@@ -1,6 +1,6 @@
 return {
 	{
-		-- dir = "~/HDD/dev/nvim-chronos",
-		"krysx7003/chronos.nvim",
+		dir = "~/devel/chronos.nvim",
+		-- "krysx7003/chronos.nvim",
 	},
 }
