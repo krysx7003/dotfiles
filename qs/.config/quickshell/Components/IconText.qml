@@ -9,8 +9,9 @@ Rectangle {
     property color highlightColor: root.colLightGrey
     property color textColor: root.colYellow
     property int textSize: root.fontSize
+    property int compWidth: 25
 
-    Layout.preferredWidth: 25
+    Layout.preferredWidth: compWidth
     Layout.preferredHeight: parent.height
     
     color: mArea.containsMouse ? highlightColor : baseColor

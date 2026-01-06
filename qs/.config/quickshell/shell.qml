@@ -2,6 +2,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Io
+import Quickshell.Services.Pipewire
 import QtQuick
 import QtQuick.Layouts
 import "Components"
@@ -34,20 +35,17 @@ PanelWindow {
     property int memUsage: 0
 
     property string wifiIcon: "󰤮"
-
     property string btIcon: "󰂲"
 
-    property int volume: 100
+    readonly property PwNode sink: Pipewire.defaultAudioSink
+    readonly property bool muted: !!sink?.audio?.muted
+    property string volIcon: muted ?  "󰖁": "󰕾"
 
     property string batteryIcon: "󰁹"
     property int batteryValue: 100 
 
     property bool systemVisible: false
     property int bottomLeft: 5
-
-    property bool volumeVisible: false
-
-    property bool wifiVisible: false
 
     property bool btVisible: false
 
@@ -164,22 +162,6 @@ PanelWindow {
         Component.onCompleted: running = true
     }
 
-    Process {
-        id: volumeProc
-        command: ["sh","-c","wpctl get-volume @DEFAULT_AUDIO_SINK@"]
-        stdout: SplitParser{
-            onRead: data => {
-                var parts = data.trim().split(/\s+/)
-                root.volume = parseFloat(parts[1]) * 100
-            }
-        }
-        Component.onCompleted: running = true
-    }
-     
-    Process {
-        id: setVolumeProc
-        command: ["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", (root.volume / 100.0).toFixed(2)]
-    }
 
     Timer {
         interval: 2000
@@ -199,7 +181,6 @@ PanelWindow {
         onTriggered: {
             wifiProc.running = true
             btProc.running = true
-            volumeProc.running = true
         }
     }
     
@@ -221,6 +202,7 @@ PanelWindow {
 
 
     RowLayout {
+
         anchors{
             fill: parent
             topMargin: 6
@@ -235,7 +217,6 @@ PanelWindow {
                 focusGrab.active = true
                 root.systemVisible = !root.systemVisible
 
-                root.volumeVisible = false
                 root.wifiVisible = false
                 root.btVisible = false
 
@@ -252,7 +233,7 @@ PanelWindow {
                 id: workspaceButton
                 property var ws: Hyprland.workspaces.values.find(w => w.id === index + 1)
                 property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)
-                
+
                 width: 30
                 height: parent.height
                 visible: ws ? true : false
@@ -305,36 +286,6 @@ PanelWindow {
             font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
         }
 
-
-        LabelText {
-            id: volumeButton
-            label: "VOL "
-            content: root.volume + "%"
-            clickable: true
-            
-            onClick: () =>{
-                focusGrab.active = true
-                root.volumeVisible = !root.volumeVisible
-
-                root.systemVisible = false
-                root.wifiVisible = false
-                root.btVisible = false
-            } 
-            scrollable: true
-            onScroll: (wheel) => {
-                if (wheel.angleDelta.y > 0) {
-                    root.volume = Math.min(100, root.volume + 5)
-                } else {
-                    root.volume = Math.max(0, root.volume - 5)
-                }
-                setVolumeProc.running = true
-                 
-                wheel.accepted = true
-            }
-        }
-        Rectangle { width: 1; height: 14; color: root.colGrey }
-
-
         LabelText {
             label: "RAM "
             content: root.memUsage + "%"
@@ -348,30 +299,15 @@ PanelWindow {
         }
         Rectangle { width: 1; height: 14; color: root.colGrey }
 
-        IconText { 
-            id: wifiButton
-            content: root.wifiIcon
-            onClick: () =>{
-                focusGrab.active = true
-                root.wifiVisible = !root.wifiVisible
-
-                root.systemVisible = false
-                root.volumeVisible = false
-                root.btVisible = false
-            }
-        }
-        Rectangle { width: 1; height: 14; color: root.colGrey }
-
         IconText {
             id: btButton
-            content: root.btIcon 
+            content: root.btIcon + " " + root.volIcon + " " + root.wifiIcon
+            compWidth: 50
             onClick: () =>{
                 focusGrab.active = true
                 root.btVisible = !root.btVisible
 
                 root.systemVisible = false
-                root.volumeVisible = false
-                root.wifiVisible = false
             }
         }
         Rectangle { width: 1; height: 14; color: root.colGrey }
@@ -403,20 +339,6 @@ PanelWindow {
         visible: systemVisible
     }
 
-    VolumePopup {
-        id: volume
-        visible: volumeVisible
-
-        x: volumeButton.x + volumeButton.width/2 - width/2
-    }
-
-    WifiPopup {
-        id: wifi
-        visible: wifiVisible
-
-        x: wifiButton.x + wifiButton.width/2 - width/2
-    }
-
     BtPopup {
         id: bt
         visible: btVisible
@@ -426,13 +348,11 @@ PanelWindow {
 
     HyprlandFocusGrab {
         id: focusGrab
-        windows: [root,system,volume,wifi,bt]
+        windows: [root,system,bt]
         active: false
 
         onCleared: {
             root.systemVisible = false
-            root.volumeVisible = false
-            root.wifiVisible = false
             root.btVisible = false
 
             active = false
@@ -449,8 +369,6 @@ PanelWindow {
             
             if (event.key === Qt.Key_Escape) {
                 root.systemVisible = false
-                root.volumeVisible = false
-                root.wifiVisible = false
                 root.btVisible = false
 
                 focusGrab.active = false

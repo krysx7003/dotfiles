@@ -1,19 +1,40 @@
 import Quickshell
+import Quickshell.Services.Pipewire
 import QtQuick
 
 Popup {
-    Row {
+    implicitWidth: 300
+    
+    readonly property PwNode sink: Pipewire.defaultAudioSink
+
+    readonly property bool muted: !!sink?.audio?.muted
+    readonly property real volume: sink?.audio?.volume ?? 0
+
+    PwObjectTracker {
+        objects: [sink]
+    }
+
+    Connections {
+        target: sink?.audio
+    }
+
+    Column {
         anchors.fill: parent
-        Rectangle{
-            width: parent.width/2
-            height: 30
-            color: "#ff0000"
+        anchors.topMargin: 10
+        spacing: 10 
+
+        SliderBox {
+            labelText: "Volume"
+            iconText: muted ?  "󰖁": "󰕾"
+            sliderValue: volume
         }
 
-        Rectangle{
-            width: parent.width/2
-            height: 30
-            color: "#0000ff"
+        SliderBox {
+            labelText: "Brightness"
+            iconText: "󰃠"
+            sliderValue: 0.25
         }
+
     }
 }
+
