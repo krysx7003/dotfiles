@@ -1,13 +1,11 @@
-import Quickshell.Services.Pipewire
 import QtQuick
 
 Rectangle {
-    readonly property PwNode sink: Pipewire.defaultAudioSink
-
-
     property string labelText: ""
     property string iconText: ""
-    property var sliderValue: 0.0
+    property alias sliderValue: slider.value
+    property var onSlider: () => { console.log("test") }
+
 
     color: root.colLightGrey
     radius: 5
@@ -43,10 +41,7 @@ Rectangle {
                 width: parent.width - icon.width
                 value: sliderValue
 
-                onSlide: () => {
-                    sink.audio.muted = false
-                    sink.audio.volume = value
-                }
+                onSlide: onSlider
             }
         }
     }
