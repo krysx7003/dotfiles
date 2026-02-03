@@ -46,8 +46,11 @@ PanelWindow {
 
     property bool systemVisible: false
     property int bottomLeft: 5
+    property int bottomRight: 5
 
     property bool servicesVisible: false
+
+    property bool clockVisible: false
 
     Process {
         id: cpuProc
@@ -197,7 +200,7 @@ PanelWindow {
         topLeftRadius: 5
         topRightRadius: 5
         bottomLeftRadius: root.bottomLeft
-        bottomRightRadius: 5
+        bottomRightRadius: root.bottomRight
     }
 
 
@@ -207,19 +210,27 @@ PanelWindow {
             fill: parent
             topMargin: 6
             leftMargin: 10
-            rightMargin: 10
+            rightMargin: 15
             bottomMargin: 0
         }
         
         IconText {
+            Layout.leftMargin: -5
+            Layout.rightMargin: -5
+            Layout.preferredWidth: content.length * 30
+
+            topLeftRadius: 5
+            bottomLeftRadius: 5
+
             content: "⏻"
             onClick: () =>{
                 focusGrab.active = true
                 root.systemVisible = !root.systemVisible
-                root.bottomLeft = root.systemVisible ? 0 : 5
-
-                root.wifiVisible = false
                 root.servicesVisible = false
+                root.clockVisible = false
+                root.bottomLeft = root.systemVisible ? 0 : 5
+                root.bottomRight = root.clockVisible ? 0 : 5
+
 
                 system.uptimeProcess.running = true
             }
@@ -301,13 +312,20 @@ PanelWindow {
 
         IconText {
             id: servicesButton
+
+            Layout.leftMargin: -5
+            Layout.rightMargin: -5
+            Layout.preferredWidth: content.length * 8
+
             content: root.btIcon + " " + root.volIcon + " " + root.wifiIcon
-            compWidth: 50
             onClick: () =>{
                 focusGrab.active = true
                 root.servicesVisible = !root.servicesVisible
 
                 root.systemVisible = false
+                root.clockVisible = false
+                root.bottomLeft = root.systemVisible ? 0 : 5
+                root.bottomRight = root.clockVisible ? 0 : 5
             }
         }
         Rectangle { width: 1; height: 14; color: root.colGrey }
@@ -318,18 +336,52 @@ PanelWindow {
         }
         Rectangle { width: 1; height: 14; color: root.colGrey }
 
-        Text {
-            id: clock
-            text: Qt.formatDateTime(new Date(), "d-M-yyyy hh:mm:ss" )
+        Rectangle {
+            id: clockButton
+            topRightRadius: 5
+            bottomRightRadius: 5
+            height: parent.height
+            Layout.leftMargin: -5
+            Layout.rightMargin: -10
+            width: 155
 
-            color: root.colYellow
-            font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+            color: calArea.containsMouse ? root.colLightGrey : root.colDarkGrey
 
-            Timer {
-                interval: 1000
-                running: true
-                repeat: true
-                onTriggered: clock.text = Qt.formatDateTime(new Date(), "d-M-yyyy hh:mm:ss" )
+            Text {
+                id: clockWidget
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.leftMargin: 10 
+                anchors.rightMargin: 5 
+                text: Qt.formatDateTime(new Date(), "d-M-yyyy hh:mm:ss" )
+
+                color: root.colYellow
+                font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+
+                Timer {
+                    interval: 1000
+                    running: true
+                    repeat: true
+                    onTriggered: clockWidget.text = Qt.formatDateTime(new Date(), "d-M-yyyy hh:mm:ss" )
+                }
+            }
+
+            MouseArea {
+                id: calArea
+                anchors.fill: parent
+
+                hoverEnabled: true
+                onClicked: () => {
+                    focusGrab.active = true
+
+                    root.systemVisible = false
+                    root.servicesVisible = false
+                    root.clockVisible = !root.clockVisible
+
+                    root.bottomLeft = root.systemVisible ? 0 : 5
+                    root.bottomRight = root.clockVisible ? 0 : 5
+                }
+                cursorShape: Qt.PointingHandCursor
             }
         }
     }
@@ -346,15 +398,24 @@ PanelWindow {
         x: servicesButton.x + servicesButton.width/2 - width/2
     }
 
+    PopupClock {
+        id: clock
+        visible: clockVisible
+
+        x: clockButton.x - width/2 - 10 
+    }
+
     HyprlandFocusGrab {
         id: focusGrab
-        windows: [root,system,services]
+        windows: [root,system,services,clock]
         active: false
 
         onCleared: {
             root.systemVisible = false
             root.servicesVisible = false
-            root.bottomLeft = root.systemVisible ? 0 : 5
+            root.clockVisible = false
+            root.bottomLeft = 5
+            root.bottomRight = 5
 
             active = false
         }
@@ -370,8 +431,10 @@ PanelWindow {
             
             if (event.key === Qt.Key_Escape) {
                 root.systemVisible = false
-                root.bottomLeft = root.systemVisible ? 0 : 5
                 root.servicesVisible = false
+                root.clockVisible = false
+                root.bottomLeft = 5
+                root.bottomRight = 5
 
                 focusGrab.active = false
                 return
