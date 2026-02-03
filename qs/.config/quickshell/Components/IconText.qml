@@ -13,7 +13,7 @@ Rectangle {
 
     Layout.preferredWidth: compWidth
     Layout.preferredHeight: parent.height
-    
+
     color: mArea.containsMouse ? highlightColor : baseColor
 
     Text {

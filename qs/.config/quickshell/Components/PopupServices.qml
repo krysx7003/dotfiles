@@ -7,7 +7,7 @@ Popup {
     id: popup
 
     implicitWidth: 350
-    implicitHeight: 170
+    implicitHeight: 190
     
     readonly property PwNode sink: Pipewire.defaultAudioSink
 
@@ -24,7 +24,6 @@ Popup {
     Connections {
         target: sink?.audio
     }
-
 
     Process {
         id: brightnessProc
@@ -53,28 +52,35 @@ Popup {
         anchors.topMargin: 10
         spacing: 10 
 
-        Row {
-            spacing: 10
+
+        Rectangle {
+            color: root.colLightGrey
+            radius: 5
 
             anchors.left: parent.left
             anchors.right: parent.right
-
             anchors.leftMargin: 10
             anchors.rightMargin: 10
 
-            height: 25
+            implicitHeight: 45
 
-            ButtonServices {
-                labelText: "Test"
-                implicitWidth: parent.width/2 - 5
-            }
+            Row {
+                anchors.fill: parent
+                anchors.margins: 10
 
-            ButtonServices {
-                labelText: "Test2"
-                implicitWidth: parent.width/2 - 5
+                spacing: 10
+
+                ButtonServices {
+                    labelText: root.wifiIcon + " " + "Test"
+                    implicitWidth: parent.width/2 - 5
+                }
+
+                ButtonServices {
+                    labelText: root.btIcon + " " + "Test2"
+                    implicitWidth: parent.width/2 - 5
+                }
             }
         }
-
 
         Rectangle {
             color: root.colLightGrey

@@ -140,7 +140,7 @@ PanelWindow {
     }
 
     Process {
-        id: servicesProc
+        id: btProc
         command: ["sh","-c","
             power=$(bluetoothctl show | grep -q \"Powered: yes\")
             connect=$(bluetoothctl devices Connected | grep -q \"Device\")
@@ -180,7 +180,7 @@ PanelWindow {
         repeat: true
         onTriggered: {
             wifiProc.running = true
-            servicesProc.running = true
+            btProc.running = true
         }
     }
     

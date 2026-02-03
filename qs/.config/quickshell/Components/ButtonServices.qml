@@ -9,9 +9,12 @@ Rectangle {
     property string labelText: ""
     property bool enabled: false
 
-    property color backgroundColor: enabled ? root.colYellow : root.colLightGrey
+    property var toggleClick: () => console.log("toggle" + labelText)
+    property var expandClick: () => console.log("expand" + labelText)
+
+    property color backgroundColor: enabled ? root.colYellow : root.colWhite
     property color highlightColor: enabled ? root.colHighlight : root.colGrey
-    property color textColor: enabled ? root.colDarkGrey : root.colWhite
+    property color textColor: root.colDarkGrey
 
     color: button.backgroundColor
     radius: 5
@@ -20,15 +23,38 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 5
 
-        Text {
-            Layout.alignment: Qt.AlignVCenter
+        Rectangle {
             Layout.fillWidth: true
+            Layout.rightMargin: -5
+            height: 25
 
-            text: labelText 
-            color: button.textColor
-            font { family: root.fontFamily; pixelSize: root.fontSize }
+            topLeftRadius: 5
+            bottomLeftRadius: 5
+
+            color: mArea.containsMouse ? highlightColor : backgroundColor
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 10 
+
+                text: labelText 
+                color: button.textColor
+                font { family: root.fontFamily; pixelSize: root.fontSize }
+            }
+
+            MouseArea {
+                id: mArea
+                anchors.fill: parent
+
+                hoverEnabled: true
+                onClicked: () => {
+                    toggleClick()
+                    button.enabled = !button.enabled
+                }
+                cursorShape: Qt.PointingHandCursor
+            }
         }
 
         Rectangle {
@@ -39,6 +65,7 @@ Rectangle {
 
         IconText{
             Layout.alignment: Qt.AlignVCenter
+            Layout.leftMargin: -5
             compWidth: 15
 
             topRightRadius: 5
@@ -49,6 +76,8 @@ Rectangle {
             textColor: button.textColor
 
             content: ">"
+
+            onClick: expandClick
         }
     }
 }
