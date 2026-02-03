@@ -47,7 +47,7 @@ PanelWindow {
     property bool systemVisible: false
     property int bottomLeft: 5
 
-    property bool btVisible: false
+    property bool servicesVisible: false
 
     Process {
         id: cpuProc
@@ -140,7 +140,7 @@ PanelWindow {
     }
 
     Process {
-        id: btProc
+        id: servicesProc
         command: ["sh","-c","
             power=$(bluetoothctl show | grep -q \"Powered: yes\")
             connect=$(bluetoothctl devices Connected | grep -q \"Device\")
@@ -180,7 +180,7 @@ PanelWindow {
         repeat: true
         onTriggered: {
             wifiProc.running = true
-            btProc.running = true
+            servicesProc.running = true
         }
     }
     
@@ -216,12 +216,12 @@ PanelWindow {
             onClick: () =>{
                 focusGrab.active = true
                 root.systemVisible = !root.systemVisible
+                root.bottomLeft = root.systemVisible ? 0 : 5
 
                 root.wifiVisible = false
-                root.btVisible = false
+                root.servicesVisible = false
 
                 system.uptimeProcess.running = true
-                root.bottomLeft = root.bottomLeft == 5 ? 0 : 5
             }
         } 
         Rectangle { width: 1; height: 14; color: root.colGrey }
@@ -300,12 +300,12 @@ PanelWindow {
         Rectangle { width: 1; height: 14; color: root.colGrey }
 
         IconText {
-            id: btButton
+            id: servicesButton
             content: root.btIcon + " " + root.volIcon + " " + root.wifiIcon
             compWidth: 50
             onClick: () =>{
                 focusGrab.active = true
-                root.btVisible = !root.btVisible
+                root.servicesVisible = !root.servicesVisible
 
                 root.systemVisible = false
             }
@@ -334,26 +334,27 @@ PanelWindow {
         }
     }
 
-    SystemPopup {
+    PopupSystem {
         id: system
         visible: systemVisible
     }
 
-    BtPopup {
-        id: bt
-        visible: btVisible
+    PopupServices {
+        id: services
+        visible: servicesVisible
 
-        x: btButton.x + btButton.width/2 - width/2
+        x: servicesButton.x + servicesButton.width/2 - width/2
     }
 
     HyprlandFocusGrab {
         id: focusGrab
-        windows: [root,system,bt]
+        windows: [root,system,services]
         active: false
 
         onCleared: {
             root.systemVisible = false
-            root.btVisible = false
+            root.servicesVisible = false
+            root.bottomLeft = root.systemVisible ? 0 : 5
 
             active = false
         }
@@ -369,7 +370,8 @@ PanelWindow {
             
             if (event.key === Qt.Key_Escape) {
                 root.systemVisible = false
-                root.btVisible = false
+                root.bottomLeft = root.systemVisible ? 0 : 5
+                root.servicesVisible = false
 
                 focusGrab.active = false
                 return
