@@ -35,7 +35,12 @@ PanelWindow {
     property int memUsage: 0
 
     property string wifiIcon: "󰤮"
+    property bool wifiEnabled: false
+    property string wifiSSID: "No network connected"
+
     property string btIcon: "󰂲"
+    property bool btEnabled: false
+    property string btDevice: "No device connected"
 
     readonly property PwNode sink: Pipewire.defaultAudioSink
     readonly property bool muted: !!sink?.audio?.muted
@@ -88,22 +93,40 @@ PanelWindow {
 
     Process {
         id: wifiProc
-        command: ["sh","-c","iw dev wlp0s20f3 link | grep signal"]
+        command: ["sh","-c",
+        "
+        state=$(nmcli device show wlp0s20f3 | awk \'/GENERAL.STATE:/ {print $2}\')
+        strength=$(iw dev wlp0s20f3 link | awk \'/SSID:/ {ssid=$2} /signal:/ {print ssid,$2}\')
+        echo \"$state $strength\"
+        "]//Move to separate bash script 
         stdout: SplitParser{
             onRead: data => {
                 var parts = data.trim().split(/\s+/)
 
-                if (parts.length >= 2){
-                    var quality = parseInt(parts[1])
+                console.log(data)
+                var state = parseInt(parts[0])
+
+                if (state == 100){ //Replace with variables
+                    root.wifiEnabled = true
+                    var quality = parseInt(parts[2])
+                    root.wifiSSID = parts[1]
 
                     if (quality > -40 ) root.wifiIcon = "󰤨"
                     else if (quality > -60) root.wifiIcon = "󰤥"
                     else if (quality > -80) root.wifiIcon = "󰤢"
                     else root.wifiIcon = "󰤟"
-                } else {
-                    root.wifiIcon = "󰤮"
-                }
 
+                } else if (state == 30) {
+                    root.wifiEnabled = true
+                    root.wifiIcon = "󰤯"
+                    root.wifiSSID = "No network connected"
+
+                } else {
+                    root.wifiEnabled = false
+                    root.wifiIcon = "󰤮"
+                    root.wifiSSID = "Disabled"
+
+                }
             }
         }
         Component.onCompleted: running = true
@@ -116,7 +139,7 @@ PanelWindow {
             percentage=$(echo \"$data\" | grep 'percentage' | awk '{print $2}')
             state=$(echo \"$data\" | grep 'state' | awk '{print $2}')
             echo \"$percentage $state\"
-        "]
+        "]//Move to separate bash script
         stdout: SplitParser{
             onRead: data => {
                 var parts = data.trim().split(/\s+/)
@@ -145,21 +168,34 @@ PanelWindow {
     Process {
         id: btProc
         command: ["sh","-c","
-            power=$(bluetoothctl show | grep -q \"Powered: yes\")
-            connect=$(bluetoothctl devices Connected | grep -q \"Device\")
+            power=$(bluetoothctl show | grep \"Powered:\")
+            connect=$(bluetoothctl devices Connected)
             echo \"$power $connect\"
-        "]
+        "]//Move to separate bash script
         stdout: SplitParser{
             onRead: data => {
                 var parts = data.trim().split(/\s+/)
-                if (parts.length == 1){
+                if (parts[1] == "yes"){
+                    root.btEnabled = true
                     root.btIcon = "󰂯"
-                } else if (parts.length == 2){
-                    root.btIcon = "󰂰"
+                    if (parts.length > 2){
+                        root.btIcon = "󰂰"
+
+                        var devName = ""
+                        for(var i = 4; i < parts.length; i++){
+                            devName += parts[i] + " "
+                        }
+
+                        root.btDevice = devName
+
+                    } else {
+                        root.btDevice = "No device connected"
+                    }
+
                 } else {
+                    root.btEnabled = false
                     root.btIcon = "󰂲"
                 }
-
             }
         }
         Component.onCompleted: running = true
