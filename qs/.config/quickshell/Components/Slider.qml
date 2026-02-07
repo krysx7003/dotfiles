@@ -16,7 +16,7 @@ Slider {
         width: control.availableWidth
         height: implicitHeight
         radius: 5
-        color: root.colWhite
+        color: root.colGrey
 
         Rectangle {
             width: control.visualPosition * parent.width
