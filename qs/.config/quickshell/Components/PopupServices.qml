@@ -71,13 +71,19 @@ Popup {
                 spacing: 10
 
                 ButtonServices {
-                    labelText: root.wifiIcon + " " + "Test"
+                    icon: root.wifiIcon
+                    labelText: root.wifiSSID
                     implicitWidth: parent.width/2 - 5
+
+                    enabled: root.wifiEnabled
                 }
 
                 ButtonServices {
-                    labelText: root.btIcon + " " + "Test2"
+                    icon: root.btIcon
+                    labelText: root.btDevice
                     implicitWidth: parent.width/2 - 5
+
+                    enabled: root.btEnabled
                 }
             }
         }
