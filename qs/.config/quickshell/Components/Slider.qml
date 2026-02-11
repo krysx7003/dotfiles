@@ -5,6 +5,7 @@ Slider {
     id: control
     property color colFilled: root.colYellow
     property var onSlide: () => { console.log("test") }
+    property bool barVisible: true
 
     value: 0.5
 
@@ -23,7 +24,7 @@ Slider {
             height: parent.height
             color: control.colFilled
             radius: 5
-            visible: control.value >= 0.05
+            visible: control.value >= 0.05 && barVisible
         }
 
         Rectangle {
@@ -31,7 +32,7 @@ Slider {
             height: parent.height
             color: control.colFilled
             radius: 5
-            visible: control.value < 0.05 && control.value != 0
+            visible: control.value < 0.05 && control.value != 0 && barVisible
         }
     }
 

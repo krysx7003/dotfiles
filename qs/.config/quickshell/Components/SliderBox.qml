@@ -3,7 +3,9 @@ import QtQuick
 Column {
     property string labelText: ""
     property string iconText: ""
+
     property alias sliderValue: slider.value
+    property alias barVisible: slider.barVisible
     property var onSlider: () => { console.log("test") }
     width: parent.width
 
