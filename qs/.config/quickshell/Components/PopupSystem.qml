@@ -9,7 +9,8 @@ Popup {
     property string uptime: ""
     property int textSize: 28
     property alias uptimeProcess: uptimeProc
-    implicitHeight: 120
+    implicitHeight: 100
+    implicitWidth: 400
 
 
     Process {
@@ -65,7 +66,7 @@ Popup {
 
         Rectangle{
             Layout.fillWidth: true
-            Layout.preferredHeight: 60
+            Layout.preferredHeight: 40
             radius: 5
             color: root.colYellow
 
