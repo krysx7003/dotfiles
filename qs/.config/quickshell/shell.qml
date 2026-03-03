@@ -57,6 +57,17 @@ PanelWindow {
 
     property bool clockVisible: false
 
+    property var closeAllPopups: () => {
+        root.systemVisible = false
+        root.servicesVisible = false
+        root.clockVisible = false
+        root.bottomLeft = 5
+        root.bottomRight = 5
+
+        focusGrab.active = false
+    }
+    
+
     Process {
         id: cpuProc
         command: ["sh","-c","head -1 /proc/stat"]
@@ -102,8 +113,6 @@ PanelWindow {
         stdout: SplitParser{
             onRead: data => {
                 var parts = data.trim().split(/\s+/)
-
-                console.log(data)
                 var state = parseInt(parts[0])
 
                 if (state == 100){ //Replace with variables
@@ -260,13 +269,13 @@ PanelWindow {
 
             content: "⏻"
             onClick: () =>{
-                focusGrab.active = true
-                root.systemVisible = !root.systemVisible
                 root.servicesVisible = false
                 root.clockVisible = false
-                root.bottomLeft = root.systemVisible ? 0 : 5
-                root.bottomRight = root.clockVisible ? 0 : 5
+                root.bottomRight = 5
 
+                focusGrab.active = true
+                root.systemVisible = !root.systemVisible
+                root.bottomLeft = root.systemVisible ? 0 : 5
 
                 system.uptimeProcess.running = true
             }
@@ -317,7 +326,7 @@ PanelWindow {
         }
         Rectangle { width: 1; height: 14; color: root.colGrey }
 
-        Text {
+        Text { 
             Layout.fillWidth: true
 
             property var ws: Hyprland.focusedWorkspace
@@ -355,13 +364,13 @@ PanelWindow {
 
             content: root.btIcon + " " + root.volIcon + " " + root.wifiIcon
             onClick: () =>{
-                focusGrab.active = true
-                root.servicesVisible = !root.servicesVisible
-
                 root.systemVisible = false
                 root.clockVisible = false
-                root.bottomLeft = root.systemVisible ? 0 : 5
-                root.bottomRight = root.clockVisible ? 0 : 5
+                root.bottomLeft = 5
+                root.bottomRight = 5
+
+                focusGrab.active = true
+                root.servicesVisible = !root.servicesVisible
             }
         }
         Rectangle { width: 1; height: 14; color: root.colGrey }
@@ -379,7 +388,7 @@ PanelWindow {
             height: parent.height
             Layout.leftMargin: -5
             Layout.rightMargin: -10
-            width: 155
+            width: 165
 
             color: calArea.containsMouse ? root.colLightGrey : root.colDarkGrey
 
@@ -408,13 +417,12 @@ PanelWindow {
 
                 hoverEnabled: true
                 onClicked: () => {
-                    focusGrab.active = true
-
                     root.systemVisible = false
                     root.servicesVisible = false
-                    root.clockVisible = !root.clockVisible
+                    root.bottomLeft = 5
 
-                    root.bottomLeft = root.systemVisible ? 0 : 5
+                    focusGrab.active = true
+                    root.clockVisible = !root.clockVisible
                     root.bottomRight = root.clockVisible ? 0 : 5
                 }
                 cursorShape: Qt.PointingHandCursor
@@ -438,7 +446,7 @@ PanelWindow {
         id: clock
         visible: clockVisible
 
-        x: clockButton.x - width/2 - 10 
+        x: clockButton.x - width/2 
     }
 
     HyprlandFocusGrab {
@@ -447,13 +455,7 @@ PanelWindow {
         active: false
 
         onCleared: {
-            root.systemVisible = false
-            root.servicesVisible = false
-            root.clockVisible = false
-            root.bottomLeft = 5
-            root.bottomRight = 5
-
-            active = false
+                root.closeAllPopups()
         }
     }
 
@@ -466,13 +468,7 @@ PanelWindow {
             console.log("Key pressed:", event.key, "modifiers:", event.modifiers)
             
             if (event.key === Qt.Key_Escape) {
-                root.systemVisible = false
-                root.servicesVisible = false
-                root.clockVisible = false
-                root.bottomLeft = 5
-                root.bottomRight = 5
-
-                focusGrab.active = false
+                root.closeAllPopups()
                 return
             }
             

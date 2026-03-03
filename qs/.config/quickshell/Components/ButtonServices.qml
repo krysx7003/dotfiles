@@ -10,8 +10,7 @@ Rectangle {
     property string labelText: ""
     property bool enabled: false
 
-    property var toggleClick: () => console.log("toggle" + labelText)
-    property var expandClick: () => console.log("expand" + labelText)
+    property var onClick: () => console.log("expand" + labelText)
 
     property color backgroundColor: enabled ? root.colYellow : root.colGrey
     property color highlightColor: enabled ? root.colHighlight : root.colWhite
@@ -25,14 +24,11 @@ Rectangle {
     RowLayout {
         anchors.fill: parent
 
-        
         Rectangle {
             Layout.fillWidth: true
-            Layout.rightMargin: -5
             height: 25
 
-            topLeftRadius: 5
-            bottomLeftRadius: 5
+            radius: 5
             color: mArea.containsMouse ? highlightColor : backgroundColor
 
             RowLayout {
@@ -40,9 +36,6 @@ Rectangle {
                 anchors.leftMargin: 5
                 anchors.rightMargin: 2
                 Text {
-                    Layout.preferredWidth: implicitWidth
-                    Layout.maximumWidth: implicitWidth
-
                     text: icon
                     color: button.textColor
                     font { family: root.fontFamily; pixelSize: root.fontSize }
@@ -76,7 +69,6 @@ Rectangle {
                         }
 
                         onImplicitWidthChanged: {
-                            // If label changes later, re-check
                             if (needsMarquee && !marqueeTimer.running)
                                 marqueeTimer.start()
                             else if (!needsMarquee && marqueeTimer.running)
@@ -105,6 +97,19 @@ Rectangle {
                         }
                     }
                 }
+
+                Rectangle {
+                    width: 2
+                    height: parent.height
+                    color: button.textColor
+                }
+
+                Text{
+                    text: ">"
+                    color: button.textColor
+                    font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+                }
+
             }
 
             MouseArea {
@@ -112,34 +117,11 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: () => {
-                    toggleClick()
-                    button.enabled = !button.enabled
+                    onClick()
                 }
                 cursorShape: Qt.PointingHandCursor
             }
         }
 
-        Rectangle {
-            width: 2
-            height: parent.height
-            color: button.textColor
-        }
-
-        IconText{
-            Layout.alignment: Qt.AlignVCenter
-            Layout.leftMargin: -5
-            compWidth: 15
-
-            topRightRadius: 5
-            bottomRightRadius: 5
-
-            baseColor: button.backgroundColor
-            highlightColor: button.highlightColor
-            textColor: button.textColor
-
-            content: ">"
-
-            onClick: expandClick
-        }
     }
 }

@@ -12,14 +12,49 @@ Popup {
         anchors.fill: parent
         anchors.margins: 10
 
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 25
+        RowLayout {
+            Rectangle {
+                Layout.preferredWidth: 60
+                Layout.preferredHeight: 55
+                color: root.colLightGrey
+                radius: 5
 
-            color: root.colLightGrey
+                Text {
+                    anchors.fill: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.topMargin: 4
+                    anchors.rightMargin: 9
+                    text: "󰣇"
+                    color: root.colYellow
 
-            radius: 5
+                    font { family: root.fontFamily; pixelSize: 40; bold: true }
+                }
+            }
 
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 55
+                color: root.colLightGrey
+                radius: 5
+
+                Text {
+                    id: clockWidget
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    horizontalAlignment: Text.AlignHCenter
+                    text: Qt.formatDateTime(new Date(), "hh:mm:ss" )
+
+                    color: root.colYellow
+                    font { family: root.fontFamily; pixelSize: 40; bold: true }
+
+                    Timer {
+                        interval: 1000
+                        running: true
+                        repeat: true
+                        onTriggered: clockWidget.text = Qt.formatDateTime(new Date(), "hh:mm:ss" )
+                    }
+                }
+            }
         }
         Calendar{
             id: calendar

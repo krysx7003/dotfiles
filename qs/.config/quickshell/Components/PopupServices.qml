@@ -1,13 +1,15 @@
 import Quickshell
 import QtQuick
+import QtQuick.Layouts
 import Quickshell.Io
 import Quickshell.Services.Pipewire
+import Quickshell.Bluetooth
 
 Popup {
     id: popup
 
     implicitWidth: 350
-    implicitHeight: 190
+    implicitHeight: 220
     
     readonly property PwNode sink: Pipewire.defaultAudioSink
 
@@ -52,7 +54,6 @@ Popup {
         anchors.topMargin: 10
         spacing: 10 
 
-
         Rectangle {
             color: root.colLightGrey
             radius: 5
@@ -62,28 +63,131 @@ Popup {
             anchors.leftMargin: 10
             anchors.rightMargin: 10
 
-            implicitHeight: 45
+            implicitHeight: 75
 
-            Row {
+            ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: 10
 
-                spacing: 10
+                Row {
+                    Layout.fillWidth: true
+                    Layout.topMargin: 10
+                    Layout.leftMargin: 10
+                    Layout.rightMargin: 10
 
-                ButtonServices {
-                    icon: root.wifiIcon
-                    labelText: root.wifiSSID
-                    implicitWidth: parent.width/2 - 5
+                    spacing: 5
 
-                    enabled: root.wifiEnabled
+                    ButtonServices {
+                        icon: root.wifiIcon
+                        labelText: root.wifiSSID
+                        implicitWidth: parent.width/2
+
+                        enabled: root.wifiEnabled
+
+                        Process {
+                            property bool isRunning: false
+
+                            id:wifiExpand 
+                            command: ["sh", "-c", "nmgui"]
+                            
+                            onStarted: isRunning = true
+                            onExited: isRunning = false
+                            
+                            function toggle() {
+                                console.log(isRunning)
+                                if (isRunning) {
+                                    isRunning = false
+                                    return
+                                } else {
+                                    running = true
+                                }
+                            }
+                        }
+
+                        onClick: () => {
+                            root.closeAllPopups()
+                            wifiExpand.toggle()
+                        }
+                    }
+
+                    ButtonServices {
+                        icon: root.btIcon
+                        labelText: root.btDevice
+                        implicitWidth: parent.width/2
+
+                        enabled: root.btEnabled
+
+                        Process {
+                            property bool isRunning: false
+
+                            id:btExpand 
+                            command: ["sh", "-c", "blueman-manager"]
+                            
+                            onStarted: isRunning = true
+                            onExited: isRunning = false
+                            
+                            function toggle() {
+                                console.log(isRunning)
+                                if (isRunning) {
+                                    isRunning = false
+                                    return
+                                } else {
+                                    running = true
+                                }
+                            }
+                        }
+
+                        onClick: () => {
+                            root.closeAllPopups()
+                            btExpand.toggle()
+                        }
+                    }
                 }
 
-                ButtonServices {
-                    icon: root.btIcon
-                    labelText: root.btDevice
-                    implicitWidth: parent.width/2 - 5
+                Row {
+                    Layout.fillWidth: true
+                    Layout.leftMargin: 10
+                    Layout.rightMargin: 10
+                    Layout.bottomMargin: 10
 
-                    enabled: root.btEnabled
+                    spacing: 5
+                    Button {
+                        id: sinkButton
+                        property bool enabled: popup.muted
+
+                        backgroundColor: enabled ? root.colYellow : root.colGrey
+                        highlightColor: enabled ? root.colHighlight : root.colWhite
+
+                        width: parent.width/2
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 5
+                            text: sinkButton.enabled ? "󰖁 Muted": "󰕾 Unmuted"
+                            color: sinkButton.textColor
+                            font { family: root.fontFamily; pixelSize: root.fontSize }
+                        }
+                    }
+
+                    Button {
+                        id: sourceButton
+                        property bool enabled: false
+
+                        backgroundColor: enabled ? root.colYellow : root.colGrey
+                        highlightColor: enabled ? root.colHighlight : root.colWhite
+
+                        width: parent.width/2
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 5
+                            text: sinkButton.enabled ? "󰍭 Muted": "󰍬 Unmuted"
+                            color: sourceButton.textColor
+                            font { family: root.fontFamily; pixelSize: root.fontSize }
+                        }
+
+                    }
                 }
             }
         }
@@ -109,6 +213,7 @@ Popup {
                     labelText: "Volume"
                     iconText: muted ?  "󰖁": "󰕾"
                     sliderValue: volume
+                    barVisible: !muted
 
                     onSlider: () => {
                         sink.audio.muted = false
