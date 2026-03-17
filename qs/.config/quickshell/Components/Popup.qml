@@ -1,6 +1,8 @@
 import Quickshell
 import QtQuick
 
+import "../Config"
+
 PopupWindow {
     property int x: 5
     anchor.window: root
@@ -9,11 +11,11 @@ PopupWindow {
 
     implicitWidth: 500
     implicitHeight: 200
-    color: root.colTransparent
+    color: Config.colors.transparent
 
     Rectangle {
         anchors.fill: parent
-        color: root.colDarkGrey
+        color: Config.colors.background
         bottomLeftRadius: 5
         bottomRightRadius: 5
     }

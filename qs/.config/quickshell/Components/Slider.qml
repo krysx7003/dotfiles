@@ -1,9 +1,11 @@
 import QtQuick
 import QtQuick.Controls.Basic
 
+import "../Config"
+
 Slider {
     id: control
-    property color colFilled: root.colYellow
+    property color colFilled: Config.colors.primary
     property var onSlide: () => { console.log("test") }
     property bool barVisible: true
 
@@ -17,7 +19,7 @@ Slider {
         width: control.availableWidth
         height: implicitHeight
         radius: 5
-        color: root.colGrey
+        color: Config.colors.background_alt
 
         Rectangle {
             width: control.visualPosition * parent.width

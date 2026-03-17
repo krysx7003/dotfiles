@@ -3,6 +3,8 @@ import Quickshell.Io
 import QtQuick.Layouts
 import QtQuick
 
+import "../Config"
+
 Rectangle {
     id: button
 
@@ -12,9 +14,9 @@ Rectangle {
 
     property var onClick: () => console.log("expand" + labelText)
 
-    property color backgroundColor: enabled ? root.colYellow : root.colGrey
-    property color highlightColor: enabled ? root.colHighlight : root.colWhite
-    property color textColor: root.colDarkGrey
+    property color backgroundColor: enabled ? Config.colors.primary : Config.colors.background_alt
+    property color highlightColor: enabled ? Config.colors.highlight_primary : Config.colors.secondary
+    property color textColor: Config.colors.background
 
     color: button.backgroundColor
     radius: 5
@@ -38,7 +40,7 @@ Rectangle {
                 Text {
                     text: icon
                     color: button.textColor
-                    font { family: root.fontFamily; pixelSize: root.fontSize }
+                    font: Config.fonts.thin
                 }
             
                 Item {
@@ -52,14 +54,13 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
 
                         property real marqueeX: 0
-                        property int textLen: labelText.length * 10
                         property bool needsMarquee: implicitWidth > textContainer.width
 
                         x: marqueeX
 
                         text: labelText
                         color: button.textColor
-                        font { family: root.fontFamily; pixelSize: root.fontSize }
+                        font: Config.fonts.thin
 
                         Component.onCompleted: {
                             marqueeX = 0
@@ -68,11 +69,14 @@ Rectangle {
                             }
                         }
 
-                        onImplicitWidthChanged: {
-                            if (needsMarquee && !marqueeTimer.running)
+                        onTextChanged: {
+                            marqueeTimer.stop()
+                            needsMarquee = implicitWidth > textContainer.width
+
+                            marqueeX = 0
+                            if (needsMarquee) {
                                 marqueeTimer.start()
-                            else if (!needsMarquee && marqueeTimer.running)
-                                marqueeTimer.stop()
+                            }
                         }
                     }
 
@@ -107,7 +111,7 @@ Rectangle {
                 Text{
                     text: ">"
                     color: button.textColor
-                    font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+                    font: Config.fonts.main
                 }
 
             }

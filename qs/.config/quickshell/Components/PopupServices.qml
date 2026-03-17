@@ -5,6 +5,8 @@ import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Bluetooth
 
+import "../Config"
+
 Popup {
     id: popup
 
@@ -55,7 +57,7 @@ Popup {
         spacing: 10 
 
         Rectangle {
-            color: root.colLightGrey
+            color: Config.colors.highlight
             radius: 5
 
             anchors.left: parent.left
@@ -79,7 +81,7 @@ Popup {
                     ButtonServices {
                         icon: root.wifiIcon
                         labelText: root.wifiSSID
-                        implicitWidth: parent.width/2
+                        implicitWidth: (parent.width - 5)/2
 
                         enabled: root.wifiEnabled
 
@@ -93,7 +95,6 @@ Popup {
                             onExited: isRunning = false
                             
                             function toggle() {
-                                console.log(isRunning)
                                 if (isRunning) {
                                     isRunning = false
                                     return
@@ -112,7 +113,7 @@ Popup {
                     ButtonServices {
                         icon: root.btIcon
                         labelText: root.btDevice
-                        implicitWidth: parent.width/2
+                        implicitWidth: (parent.width - 5)/2
 
                         enabled: root.btEnabled
 
@@ -126,7 +127,6 @@ Popup {
                             onExited: isRunning = false
                             
                             function toggle() {
-                                console.log(isRunning)
                                 if (isRunning) {
                                     isRunning = false
                                     return
@@ -154,10 +154,10 @@ Popup {
                         id: sinkButton
                         property bool enabled: popup.muted
 
-                        backgroundColor: enabled ? root.colYellow : root.colGrey
-                        highlightColor: enabled ? root.colHighlight : root.colWhite
+                        backgroundColor: enabled ? Config.colors.primary : Config.colors.background_alt
+                        highlightColor: enabled ? Config.colors.highlight_primary : Config.colors.secondary
 
-                        width: parent.width/2
+                        width: (parent.width - 5)/2
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
@@ -165,26 +165,30 @@ Popup {
                             anchors.leftMargin: 5
                             text: sinkButton.enabled ? "󰖁 Muted": "󰕾 Unmuted"
                             color: sinkButton.textColor
-                            font { family: root.fontFamily; pixelSize: root.fontSize }
+                            font: Config.fonts.thin
+                        }
+
+                        onClick: () => {
+                            sink.audio.muted = !sink.audio.muted
                         }
                     }
 
                     Button {
-                        id: sourceButton
+                        id: batteryButton
                         property bool enabled: false
 
-                        backgroundColor: enabled ? root.colYellow : root.colGrey
-                        highlightColor: enabled ? root.colHighlight : root.colWhite
+                        backgroundColor: enabled ? Config.colors.primary : Config.colors.background_alt
+                        highlightColor: enabled ? Config.colors.highlight_primary : Config.colors.secondary
 
-                        width: parent.width/2
+                        width: (parent.width - 5)/2
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left: parent.left
                             anchors.leftMargin: 5
-                            text: sinkButton.enabled ? "󰍭 Muted": "󰍬 Unmuted"
-                            color: sourceButton.textColor
-                            font { family: root.fontFamily; pixelSize: root.fontSize }
+                            text: batteryButton ? "󰾅 Balanced": "󰂄 Power saver"
+                            color: batteryButton.textColor
+                            font: Config.fonts.thin
                         }
 
                     }
@@ -193,7 +197,7 @@ Popup {
         }
 
         Rectangle {
-            color: root.colLightGrey
+            color: Config.colors.highlight
             radius: 5
 
             anchors.left: parent.left

@@ -1,5 +1,7 @@
 import QtQuick
 
+import "../Config"
+
 Column {
     property string labelText: ""
     property string iconText: ""
@@ -11,8 +13,8 @@ Column {
 
     Text {
         text: labelText
-        color: root.colYellow
-        font { family: root.fontFamily; bold: true }
+        color: Config.colors.primary
+        font: Config.fonts.main
     }
 
     Row {
@@ -21,8 +23,8 @@ Column {
         Text {
             id: icon
             text: iconText 
-            color: root.colYellow
-            font { family: root.fontFamily; pixelSize: 22; bold: true }
+            color: Config.colors.primary
+            font { family: root.fontFamily; bold: true }
         }
         Slider{
             id: slider

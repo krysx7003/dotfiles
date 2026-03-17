@@ -1,13 +1,15 @@
 import Quickshell
 import QtQuick
 
+import "../Config"
+
 Rectangle {
     id: button
     property var onClick: () => console.log("expand" + labelText)
 
-    property color backgroundColor: root.colYellow
-    property color highlightColor: root.colHighlight
-    property color textColor: root.colDarkGrey
+    property color backgroundColor: Config.colors.primary
+    property color highlightColor: Config.colors.highlight_primary
+    property color textColor: Config.colors.background
 
     width: 50
     height: 25

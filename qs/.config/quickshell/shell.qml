@@ -1,11 +1,13 @@
 import Quickshell
-import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Pipewire
+import Quickshell.Services.Notifications
 import QtQuick
 import QtQuick.Layouts
+
 import "Components"
+import "Config"
 
 PanelWindow {
     id: root
@@ -14,19 +16,8 @@ PanelWindow {
     anchors.right: true
 
     implicitHeight: 30
-    property color colYellow: "#f0c674"
-    property color colHighlight: "#f9e8c7"
-    property color colDarkGrey: "#282a2e" 
-    property color colGrey: "#707880"
-    property color colLightGrey: "#373b41" 
-    property color colWhite: "#c5c8c6"
-    property color colTransparent: "#000000ff"
 
-
-    property string fontFamily: "FiraCode Nerd Font"
-    property int fontSize: 14
-
-    color: root.colTransparent
+    color: Config.colors.transparent
 
     property int cpuUsage: 0
     property var lastCpuIdle: 0
@@ -40,14 +31,14 @@ PanelWindow {
 
     property string btIcon: "󰂲"
     property bool btEnabled: false
-    property string btDevice: "No device connected"
+    property string btDevice: "Disabled"
 
     readonly property PwNode sink: Pipewire.defaultAudioSink
     readonly property bool muted: !!sink?.audio?.muted
-    property string volIcon: muted ?  "󰖁": "󰕾"
+    property string volIcon: muted ? "󰖁" : "󰕾"
 
     property string batteryIcon: "󰁹"
-    property int batteryValue: 100 
+    property int batteryValue: 100
 
     property bool systemVisible: false
     property int bottomLeft: 5
@@ -57,46 +48,46 @@ PanelWindow {
 
     property bool clockVisible: false
 
-    property var closeAllPopups: () => {
-        root.systemVisible = false
-        root.servicesVisible = false
-        root.clockVisible = false
-        root.bottomLeft = 5
-        root.bottomRight = 5
+    property ObjectModel notifyModel: notificationServer.trackedNotifications
 
-        focusGrab.active = false
+    property var closeAllPopups: () => {
+        root.systemVisible = false;
+        root.servicesVisible = false;
+        root.clockVisible = false;
+        root.bottomLeft = 5;
+        root.bottomRight = 5;
+
+        focusGrab.active = false;
     }
-    
 
     Process {
         id: cpuProc
-        command: ["sh","-c","head -1 /proc/stat"]
-        stdout: SplitParser{
+        command: ["sh", "-c", "head -1 /proc/stat"]
+        stdout: SplitParser {
             onRead: data => {
-                var p = data.trim().split(/\s+/)
-                var idle = parseInt(p[4]) + parseInt(p[5])
-                var total = p.slice(1,8).reduce((a,b) => a + parseInt(b),0)
-                if (root.lastCpuTotal > 0){
-                    cpuUsage = Math.round(100 * (1 - (idle - root.lastCpuIdle) / (total - root.lastCpuTotal)))
+                var p = data.trim().split(/\s+/);
+                var idle = parseInt(p[4]) + parseInt(p[5]);
+                var total = p.slice(1, 8).reduce((a, b) => a + parseInt(b), 0);
+                if (root.lastCpuTotal > 0) {
+                    cpuUsage = Math.round(100 * (1 - (idle - root.lastCpuIdle) / (total - root.lastCpuTotal)));
                 }
-                root.lastCpuIdle = idle
-                root.lastCpuTotal = total
+                root.lastCpuIdle = idle;
+                root.lastCpuTotal = total;
             }
         }
         Component.onCompleted: running = true
     }
 
-
     Process {
         id: memProc
-        command: ["sh","-c","free | grep Mem"]
-        stdout: SplitParser{
+        command: ["sh", "-c", "free | grep Mem"]
+        stdout: SplitParser {
             onRead: data => {
-                var parts = data.trim().split(/\s+/)
-                var total = parseInt(parts[1]) || 1
-                var used = parseInt(parts[2]) || 0
+                var parts = data.trim().split(/\s+/);
+                var total = parseInt(parts[1]) || 1;
+                var used = parseInt(parts[2]) || 0;
 
-                root.memUsage = Math.round(100 * used / total)
+                root.memUsage = Math.round(100 * used / total);
             }
         }
         Component.onCompleted: running = true
@@ -104,37 +95,33 @@ PanelWindow {
 
     Process {
         id: wifiProc
-        command: ["sh","-c",
-        "
-        state=$(nmcli device show wlp0s20f3 | awk \'/GENERAL.STATE:/ {print $2}\')
-        strength=$(iw dev wlp0s20f3 link | awk \'/SSID:/ {ssid=$2} /signal:/ {print ssid,$2}\')
-        echo \"$state $strength\"
-        "]//Move to separate bash script 
-        stdout: SplitParser{
+        command: ["sh", "-c", "~/.config/quickshell/Scripts/wifi.sh"]
+        stdout: SplitParser {
             onRead: data => {
-                var parts = data.trim().split(/\s+/)
-                var state = parseInt(parts[0])
+                var parts = data.trim().split(/\s+/);
+                var state = parseInt(parts[0]);
 
-                if (state == 100){ //Replace with variables
-                    root.wifiEnabled = true
-                    var quality = parseInt(parts[2])
-                    root.wifiSSID = parts[1]
+                if (state == 100) { //Replace with variables
+                    root.wifiEnabled = true;
+                    var quality = parseInt(parts[2]);
+                    root.wifiSSID = parts[1];
 
-                    if (quality > -40 ) root.wifiIcon = "󰤨"
-                    else if (quality > -60) root.wifiIcon = "󰤥"
-                    else if (quality > -80) root.wifiIcon = "󰤢"
-                    else root.wifiIcon = "󰤟"
-
+                    if (quality > -40)
+                        root.wifiIcon = "󰤨";
+                    else if (quality > -60)
+                        root.wifiIcon = "󰤥";
+                    else if (quality > -80)
+                        root.wifiIcon = "󰤢";
+                    else
+                        root.wifiIcon = "󰤟";
                 } else if (state == 30) {
-                    root.wifiEnabled = true
-                    root.wifiIcon = "󰤯"
-                    root.wifiSSID = "No network connected"
-
+                    root.wifiEnabled = true;
+                    root.wifiIcon = "󰤯";
+                    root.wifiSSID = "No network connected";
                 } else {
-                    root.wifiEnabled = false
-                    root.wifiIcon = "󰤮"
-                    root.wifiSSID = "Disabled"
-
+                    root.wifiEnabled = false;
+                    root.wifiIcon = "󰤮";
+                    root.wifiSSID = "Disabled";
                 }
             }
         }
@@ -143,32 +130,37 @@ PanelWindow {
 
     Process {
         id: batteryProc
-        command: ["sh","-c","
-            data=$(upower -i $(upower -e | grep BAT0))
-            percentage=$(echo \"$data\" | grep 'percentage' | awk '{print $2}')
-            state=$(echo \"$data\" | grep 'state' | awk '{print $2}')
-            echo \"$percentage $state\"
-        "]//Move to separate bash script
-        stdout: SplitParser{
+        command: ["sh", "-c", "~/.config/quickshell/Scripts/battery.sh"]
+        stdout: SplitParser {
             onRead: data => {
-                var parts = data.trim().split(/\s+/)
-                
-                var value = parseInt(parts[0])
-                var state = parts[1]
-                if(state == "charging"){
-                    if ( value > 80 ) root.batteryIcon = "󰂅"
-                    else if ( value > 60 ) root.batteryIcon = "󰂊"
-                    else if ( value > 40 ) root.batteryIcon = "󰂈"
-                    else if ( value > 5 ) root.batteryIcon = "󰂆"
-                    else root.batteryIcon = "󰢟"
+                var parts = data.trim().split(/\s+/);
+
+                var value = parseInt(parts[0]);
+                var state = parts[1];
+                if (state == "charging") {
+                    if (value > 80)
+                        root.batteryIcon = "󰂅";
+                    else if (value > 60)
+                        root.batteryIcon = "󰂊";
+                    else if (value > 40)
+                        root.batteryIcon = "󰂈";
+                    else if (value > 5)
+                        root.batteryIcon = "󰂆";
+                    else
+                        root.batteryIcon = "󰢟";
                 } else {
-                    if ( value > 80 ) root.batteryIcon = "󰁹"
-                    else if ( value > 60 ) root.batteryIcon = "󰂁"
-                    else if ( value > 40 ) root.batteryIcon = "󰁽"
-                    else if ( value > 5 ) root.batteryIcon = "󰁻"
-                    else root.batteryIcon = "󰂎"
+                    if (value > 80)
+                        root.batteryIcon = "󰁹";
+                    else if (value > 60)
+                        root.batteryIcon = "󰂁";
+                    else if (value > 40)
+                        root.batteryIcon = "󰁽";
+                    else if (value > 5)
+                        root.batteryIcon = "󰁻";
+                    else
+                        root.batteryIcon = "󰂎";
                 }
-                root.batteryValue = value
+                root.batteryValue = value;
             }
         }
         Component.onCompleted: running = true
@@ -176,49 +168,43 @@ PanelWindow {
 
     Process {
         id: btProc
-        command: ["sh","-c","
-            power=$(bluetoothctl show | grep \"Powered:\")
-            connect=$(bluetoothctl devices Connected)
-            echo \"$power $connect\"
-        "]//Move to separate bash script
-        stdout: SplitParser{
+        command: ["sh", "-c", "~/.config/quickshell/Scripts/bt.sh"]
+        stdout: SplitParser {
             onRead: data => {
-                var parts = data.trim().split(/\s+/)
-                if (parts[1] == "yes"){
-                    root.btEnabled = true
-                    root.btIcon = "󰂯"
-                    if (parts.length > 2){
-                        root.btIcon = "󰂰"
+                var parts = data.trim().split(/\s+/);
+                if (parts[1] == "yes") {
+                    root.btEnabled = true;
+                    root.btIcon = "󰂯";
+                    if (parts.length > 2) {
+                        root.btIcon = "󰂰";
 
-                        var devName = ""
-                        for(var i = 4; i < parts.length; i++){
-                            devName += parts[i] + " "
+                        var devName = "";
+                        for (var i = 4; i < parts.length; i++) {
+                            devName += parts[i] + " ";
                         }
 
-                        root.btDevice = devName
-
+                        root.btDevice = devName;
                     } else {
-                        root.btDevice = "No device connected"
+                        root.btDevice = "No device connected";
                     }
-
                 } else {
-                    root.btEnabled = false
-                    root.btIcon = "󰂲"
+                    root.btEnabled = false;
+                    root.btIcon = "󰂲";
+                    root.btDevice = "Disabled";
                 }
             }
         }
         Component.onCompleted: running = true
     }
 
-
     Timer {
         interval: 2000
         running: true
         repeat: true
         onTriggered: {
-            cpuProc.running = true
-            memProc.running = true
-            batteryProc.running = true 
+            cpuProc.running = true;
+            memProc.running = true;
+            batteryProc.running = true;
         }
     }
 
@@ -227,20 +213,20 @@ PanelWindow {
         running: true
         repeat: true
         onTriggered: {
-            wifiProc.running = true
-            btProc.running = true
+            wifiProc.running = true;
+            btProc.running = true;
         }
     }
-    
+
     Rectangle {
-        anchors{
+        anchors {
             fill: parent
             topMargin: 5
             leftMargin: 5
             rightMargin: 5
             bottomMargin: 0
         }
-        color: root.colDarkGrey
+        color: Config.colors.background
 
         topLeftRadius: 5
         topRightRadius: 5
@@ -248,17 +234,16 @@ PanelWindow {
         bottomRightRadius: root.bottomRight
     }
 
-
     RowLayout {
 
-        anchors{
+        anchors {
             fill: parent
             topMargin: 6
             leftMargin: 10
             rightMargin: 15
             bottomMargin: 0
         }
-        
+
         IconText {
             Layout.leftMargin: -5
             Layout.rightMargin: -5
@@ -268,19 +253,23 @@ PanelWindow {
             bottomLeftRadius: 5
 
             content: "⏻"
-            onClick: () =>{
-                root.servicesVisible = false
-                root.clockVisible = false
-                root.bottomRight = 5
+            onClick: () => {
+                root.servicesVisible = false;
+                root.clockVisible = false;
+                root.bottomRight = 5;
 
-                focusGrab.active = true
-                root.systemVisible = !root.systemVisible
-                root.bottomLeft = root.systemVisible ? 0 : 5
+                focusGrab.active = true;
+                root.systemVisible = !root.systemVisible;
+                root.bottomLeft = root.systemVisible ? 0 : 5;
 
-                system.uptimeProcess.running = true
+                system.uptimeProcess.running = true;
             }
-        } 
-        Rectangle { width: 1; height: 14; color: root.colGrey }
+        }
+        Rectangle {
+            width: 1
+            height: 14
+            color: Config.colors.background_alt
+        }
 
         Repeater {
             model: 9
@@ -293,16 +282,16 @@ PanelWindow {
                 width: 30
                 height: parent.height
                 visible: ws ? true : false
-                
-                color: isActive ? root.colLightGrey : root.colDarkGrey
+
+                color: isActive ? Config.colors.highlight : Config.colors.background
 
                 Text {
                     text: index + 1
                     anchors.centerIn: parent
-                    color: root.colWhite
-                    font { pixelSize: root.fontSize; bold: true }
+                    color: Config.colors.secondary
+                    font: Config.fonts.main
                 }
-                
+
                 MouseArea {
                     id: mouseArea
                     anchors.fill: parent
@@ -311,49 +300,59 @@ PanelWindow {
                     cursorShape: Qt.PointingHandCursor
                 }
 
-                Rectangle{
-                    anchors{
+                Rectangle {
+                    anchors {
                         bottom: parent.bottom
                         left: parent.left
                         right: parent.right
                     }
                     height: 2
-                    color: root.colYellow
+                    color: Config.colors.primary
                     visible: isActive
                 }
-
             }
         }
-        Rectangle { width: 1; height: 14; color: root.colGrey }
+        Rectangle {
+            width: 1
+            height: 14
+            color: Config.colors.background_alt
+        }
 
-        Text { 
+        Text {
             Layout.fillWidth: true
 
             property var ws: Hyprland.focusedWorkspace
             property var toplevels: ws.toplevels
             text: {
-                var win = toplevels.values.find(t => t.activated)
-                var name = win ? win.title : ""
-                return name
+                var win = toplevels.values.find(t => t.activated);
+                var name = win ? win.title : "";
+                return name;
             }
             elide: Text.ElideRight
 
-            color: root.colWhite
-            font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+            color: Config.colors.secondary
+            font: Config.fonts.main
         }
 
         LabelText {
             label: "RAM "
             content: root.memUsage + "%"
         }
-        Rectangle { width: 1; height: 14; color: root.colGrey }
-
+        Rectangle {
+            width: 1
+            height: 14
+            color: Config.colors.background_alt
+        }
 
         LabelText {
             label: "CPU "
             content: root.cpuUsage + "%"
         }
-        Rectangle { width: 1; height: 14; color: root.colGrey }
+        Rectangle {
+            width: 1
+            height: 14
+            color: Config.colors.background_alt
+        }
 
         IconText {
             id: servicesButton
@@ -363,23 +362,31 @@ PanelWindow {
             Layout.preferredWidth: content.length * 8
 
             content: root.btIcon + " " + root.volIcon + " " + root.wifiIcon
-            onClick: () =>{
-                root.systemVisible = false
-                root.clockVisible = false
-                root.bottomLeft = 5
-                root.bottomRight = 5
+            onClick: () => {
+                root.systemVisible = false;
+                root.clockVisible = false;
+                root.bottomLeft = 5;
+                root.bottomRight = 5;
 
-                focusGrab.active = true
-                root.servicesVisible = !root.servicesVisible
+                focusGrab.active = true;
+                root.servicesVisible = !root.servicesVisible;
             }
         }
-        Rectangle { width: 1; height: 14; color: root.colGrey }
+        Rectangle {
+            width: 1
+            height: 14
+            color: Config.colors.background_alt
+        }
 
         LabelText {
             label: root.batteryIcon + " "
             content: root.batteryValue + "%"
         }
-        Rectangle { width: 1; height: 14; color: root.colGrey }
+        Rectangle {
+            width: 1
+            height: 14
+            color: Config.colors.background_alt
+        }
 
         Rectangle {
             id: clockButton
@@ -388,26 +395,26 @@ PanelWindow {
             height: parent.height
             Layout.leftMargin: -5
             Layout.rightMargin: -10
-            width: 165
+            width: 175
 
-            color: calArea.containsMouse ? root.colLightGrey : root.colDarkGrey
+            color: calArea.containsMouse ? Config.colors.highlight : Config.colors.background
 
             Text {
                 id: clockWidget
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
-                anchors.leftMargin: 10 
-                anchors.rightMargin: 5 
-                text: Qt.formatDateTime(new Date(), "d-M-yyyy hh:mm:ss" )
+                anchors.leftMargin: 10
+                anchors.rightMargin: 5
+                text: Qt.formatDateTime(new Date(), "dd-MM-yyyy hh:mm:ss")
 
-                color: root.colYellow
-                font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+                color: Config.colors.primary
+                font: Config.fonts.main
 
                 Timer {
                     interval: 1000
                     running: true
                     repeat: true
-                    onTriggered: clockWidget.text = Qt.formatDateTime(new Date(), "d-M-yyyy hh:mm:ss" )
+                    onTriggered: clockWidget.text = Qt.formatDateTime(new Date(), "dd-MM-yyyy hh:mm:ss")
                 }
             }
 
@@ -417,45 +424,64 @@ PanelWindow {
 
                 hoverEnabled: true
                 onClicked: () => {
-                    root.systemVisible = false
-                    root.servicesVisible = false
-                    root.bottomLeft = 5
+                    root.systemVisible = false;
+                    root.servicesVisible = false;
+                    root.bottomLeft = 5;
 
-                    focusGrab.active = true
-                    root.clockVisible = !root.clockVisible
-                    root.bottomRight = root.clockVisible ? 0 : 5
+                    focusGrab.active = true;
+                    root.clockVisible = !root.clockVisible;
+                    root.bottomRight = root.clockVisible ? 0 : 5;
                 }
                 cursorShape: Qt.PointingHandCursor
             }
         }
     }
 
+    NotificationPopup {
+        id: notifyPopup
+        appname: "Test"
+        title: "Text"
+        content: "Text"
+    }
+
+    NotificationServer {
+        id: notificationServer
+
+        showPopup: notify => {
+            notifyPopup.appname = notify.appName;
+            notifyPopup.title = notify.summary;
+            notifyPopup.content = notify.body;
+
+            notifyPopup.visible = true;
+        }
+    }
+
     PopupSystem {
         id: system
-        visible: systemVisible
+        visible: root.systemVisible
     }
 
     PopupServices {
         id: services
-        visible: servicesVisible
+        visible: root.servicesVisible
 
-        x: servicesButton.x + servicesButton.width/2 - width/2
+        x: servicesButton.x + servicesButton.width / 2 - width / 2
     }
 
     PopupClock {
         id: clock
-        visible: clockVisible
+        visible: root.clockVisible
 
-        x: clockButton.x - width/2 
+        x: clockButton.x - width / 2 + 10
     }
 
     HyprlandFocusGrab {
         id: focusGrab
-        windows: [root,system,services,clock]
+        windows: [root, system, services, clock]
         active: false
 
         onCleared: {
-                root.closeAllPopups()
+            root.closeAllPopups();
         }
     }
 
@@ -464,15 +490,16 @@ PanelWindow {
         anchors.fill: parent
         focus: true
 
-        Keys.onPressed: (event) => {
-            console.log("Key pressed:", event.key, "modifiers:", event.modifiers)
-            
+        Keys.onPressed: event => {
+            console.log("Key pressed:", event.key, "modifiers:", event.modifiers);
+
             if (event.key === Qt.Key_Escape) {
-                root.closeAllPopups()
-                return
+                root.closeAllPopups();
+                return;
             }
-            
-            event.accepted = true
+
+            event.accepted = true;
         }
     }
+    Reload {}
 }

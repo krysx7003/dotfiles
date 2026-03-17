@@ -2,6 +2,8 @@ import Quickshell
 import QtQuick
 import QtQuick.Layouts
 
+import "../Config"
+
 Popup {
     id: popup
 
@@ -16,7 +18,7 @@ Popup {
             Rectangle {
                 Layout.preferredWidth: 60
                 Layout.preferredHeight: 55
-                color: root.colLightGrey
+                color: Config.colors.highlight
                 radius: 5
 
                 Text {
@@ -25,16 +27,16 @@ Popup {
                     anchors.topMargin: 4
                     anchors.rightMargin: 9
                     text: "󰣇"
-                    color: root.colYellow
+                    color: Config.colors.primary
 
-                    font { family: root.fontFamily; pixelSize: 40; bold: true }
+                    font: Config.fonts.big
                 }
             }
 
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 55
-                color: root.colLightGrey
+                color: Config.colors.highlight
                 radius: 5
 
                 Text {
@@ -44,8 +46,8 @@ Popup {
                     horizontalAlignment: Text.AlignHCenter
                     text: Qt.formatDateTime(new Date(), "hh:mm:ss" )
 
-                    color: root.colYellow
-                    font { family: root.fontFamily; pixelSize: 40; bold: true }
+                    color: Config.colors.primary
+                    font: Config.fonts.big
 
                     Timer {
                         interval: 1000
@@ -65,36 +67,33 @@ Popup {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: root.colLightGrey
+            color: Config.colors.highlight
 
             radius: 5
 
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 10
-                Row {
+                RowLayout {
                     Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignTop
 
                     Text {
-                        anchors.top: parent.top
-                        anchors.topMargin: 2
-
                         text: "Notifications"
 
-                        color: root.colYellow
-                        font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+                        color: Config.colors.primary
+                        font: Config.fonts.main
                     }
+
+                    Item { Layout.fillWidth: true } 
 
                     Button {
                         property string label: "󰎟 Clear"
-                        anchors.right: parent.right
                         width:  label.length * 10 + 10
                         height: 20
                         
-                        backgroundColor: root.colLightGrey
-                        highlightColor: root.colGrey
-                        textColor: root.colYellow
+                        backgroundColor: Config.colors.highlight
+                        highlightColor: Config.colors.background_alt
+                        textColor: Config.colors.primary
 
                         Text {
                             anchors.fill: parent
@@ -103,13 +102,45 @@ Popup {
                             text: parent.label
 
                             color: parent.textColor
-                            font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+                            font: Config.fonts.main
                         }
 
+                        onClick: () => {
+                            console.log("Dismissing all notifications")
+                            while (root.notifyModel.values.length > 0){
+                                root.notifyModel.values[0].dismiss()
+                            }
+
+                        }
                     }
                 }
+                Flickable {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    contentHeight: notificationsColumn.height
+                    clip: true
+                    
+                    Column {
+                        id: notificationsColumn
+                        width: parent.width
+                        spacing: 5
+                        
+                        Repeater {
+                            model: root.notifyModel
+                            NotificationBox {
+                                appname: modelData.appName
+                                title: modelData.summary
+                                content: modelData.body
+                                onClick: () => {
+                                    console.log("Dismissing notification "+ modelData.id)
+                                    modelData.dismiss()
+                                }
+                            }
+                        }
+                    }
+                    
+                }
             }
-
         }
     }
 } 

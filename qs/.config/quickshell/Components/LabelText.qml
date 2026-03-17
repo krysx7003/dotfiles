@@ -2,6 +2,8 @@ import Quickshell
 import QtQuick
 import QtQuick.Layouts
 
+import "../Config"
+
 Rectangle {
     property string label: ""
     property string content: ""
@@ -9,7 +11,7 @@ Rectangle {
     Layout.preferredWidth: labelText.width + contentText.width + padding
     Layout.preferredHeight: parent.height
 
-    color:  root.colDarkGrey
+    color:  Config.colors.background
 
     Row {
         spacing: 2
@@ -18,15 +20,15 @@ Rectangle {
         Text {
             id: labelText
             text: label
-            color: root.colYellow
-            font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+            color: Config.colors.primary
+            font: Config.fonts.main
         }
         
         Text {
             id: contentText
             text: content
-            color: root.colWhite
-            font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+            color: Config.colors.secondary
+            font: Config.fonts.main
         }
     }
 }

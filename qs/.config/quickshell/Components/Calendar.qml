@@ -1,17 +1,19 @@
 import QtQuick
 import QtQuick.Layouts
 
+import "../Config"
+
 Rectangle {
     id: calendarBox
     width: 300
     height: calendarLayout.height + 10
 
-    color: root.colLightGrey
+    color: Config.colors.highlight
     
     property int yearOffset: 0
 
     property int targetYear: new Date().getFullYear() + yearOffset
-    property int targetMonth: 1
+    property int targetMonth: new Date().getMonth()
 
     property date currentDate: new Date()
     property date selectedDate: new Date(targetYear, targetMonth, 1)
@@ -37,8 +39,8 @@ Rectangle {
 
                 radius: 10
 
-                baseColor: root.colLightGrey
-                highlightColor: root.colGrey
+                baseColor: Config.colors.highlight
+                highlightColor: Config.colors.background_alt
 
                 onClick: () => {
                     if (calendarBox.targetMonth - 1 < 0){
@@ -53,18 +55,18 @@ Rectangle {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
 
-                color: root.colYellow
+                color: Config.colors.primary
                 text: Qt.formatDateTime(calendarBox.selectedDate, "MMMM yyyy")
 
-                font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+                font: Config.fonts.main
             }
             IconText {
                 content: ">"
 
                 radius: 10
 
-                baseColor: root.colLightGrey
-                highlightColor: root.colGrey
+                baseColor: Config.colors.highlight
+                highlightColor: Config.colors.background_alt
 
                 onClick: () => {
                     if (calendarBox.targetMonth + 1 > 11){
@@ -87,10 +89,10 @@ Rectangle {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignCenter
 
-                    color: root.colYellow
+                    color: Config.colors.primary
                     text: modelData
 
-                    font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+                    font: Config.fonts.main
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
@@ -114,17 +116,17 @@ Rectangle {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignCenter
 
-                    color: isCurrentDay ? root.colYellow : root.colLightGrey
+                    color: isCurrentDay ? Config.colors.primary : Config.colors.highlight
                     radius: 10
 
                     Text {
                         anchors.fill: parent
-                        color: parent.isCurrentDay ? root.colDarkGrey : root.colWhite
+                        color: parent.isCurrentDay ? Config.colors.background : Config.colors.secondary
                         text: parent.isValidDay ? parent.dayNum : " "
                         
                         font {
-                            family: root.fontFamily
-                            pixelSize: root.fontSize
+                            family: Config.fonts.main.family
+                            pixelSize: Config.fonts.main.pixelSize
                             bold: parent.isValidDay && ((firstDayOfMonth + parent.dayNum - 1) % 7 === 0)
                         }
                         horizontalAlignment: Text.AlignHCenter

@@ -4,6 +4,8 @@ import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Layouts
 
+import "../Config"
+
 Popup {
     id: sysPopup
     property string uptime: ""
@@ -36,7 +38,7 @@ Popup {
             Layout.fillWidth: true
             Layout.preferredHeight: 30
 
-            color: root.colLightGrey
+            color: Config.colors.highlight
             radius: 5
 
             RowLayout {
@@ -48,18 +50,69 @@ Popup {
                 
                 Text {
                     text: "Uptime:"
-                    color: root.colWhite
-                    font { family: root.fontFamily; pixelSize: root.fontSize }
+                    color: Config.colors.secondary
+                    font: Config.fonts.thin
                     Layout.alignment: Qt.AlignVCenter 
                 }
-                
-                Item { Layout.fillWidth: true }
-                
-                Text {
-                    text: sysPopup.uptime
-                    color: root.colWhite
-                    font { family: root.fontFamily; pixelSize: root.fontSize }
-                    Layout.alignment: Qt.AlignVCenter
+
+                Item {
+                    id: textContainer
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+
+                    Text {
+                        id: textItem
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        property real startX: textContainer.width - textItem.implicitWidth
+                        property real marqueeX: startX
+                        property bool needsMarquee: implicitWidth > textContainer.width
+
+                        x: marqueeX
+
+                        text: sysPopup.uptime
+                        color: Config.colors.secondary
+                        font: Config.fonts.thin
+
+                        Component.onCompleted: {
+                            marqueeX = textItem.startX 
+                            if (needsMarquee) {
+                                marqueeTimer.start()
+                            }
+                        }
+
+                        onTextChanged: {
+                            marqueeTimer.stop()
+                            needsMarquee = implicitWidth > textContainer.width
+
+                            marqueeX = textItem.startX
+                            if (needsMarquee) {
+                                marqueeTimer.start()
+                            }
+                        }
+                    }
+
+                    Timer {
+                        id: marqueeTimer
+                        property bool inPause: false
+                        interval: inPause ? 5000 : 40
+                        repeat: true
+                        running: false
+
+                        onTriggered: {
+                            if (inPause) {
+                                inPause = false
+                            } else {
+                                textItem.marqueeX -= 0.5
+                                const minX = -(textItem.implicitWidth - textContainer.width/2)
+                                if (textItem.marqueeX < minX) {
+                                    textItem.marqueeX = Math.max(0,textItem.startX)
+                                    inPause = true 
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -68,7 +121,7 @@ Popup {
             Layout.fillWidth: true
             Layout.preferredHeight: 40
             radius: 5
-            color: root.colYellow
+            color: Config.colors.primary
 
             Row {
                 anchors.fill: parent
@@ -76,15 +129,16 @@ Popup {
                     height: parent.height
                     width: parent.width /5
 
-                    baseColor: root.colYellow
-                    highlightColor: root.colHighlight
-                    textColor: root.colDarkGrey
-
-                    textSize: sysPopup.textSize
+                    baseColor: Config.colors.primary
+                    highlightColor: Config.colors.highlight_primary
+                    textColor: Config.colors.background
 
                     topLeftRadius: 5
                     bottomLeftRadius: 5
+
                     content: "󰐥"
+                    contentFont: Config.fonts.medium
+
                     Process {
                        id: shutdownProc
                        command: ["shutdown", "-h", "now"]
@@ -96,13 +150,13 @@ Popup {
                     height: parent.height
                     width: parent.width /5
 
-                    baseColor: root.colYellow
-                    highlightColor: root.colHighlight
-                    textColor: root.colDarkGrey
-
-                    textSize: sysPopup.textSize
+                    baseColor: Config.colors.primary
+                    highlightColor: Config.colors.highlight_primary
+                    textColor: Config.colors.background
 
                     content: "󰜉"
+                    contentFont: Config.fonts.medium
+
                     Process {
                        id: rebootProc
                        command: ["reboot"]
@@ -114,13 +168,13 @@ Popup {
                     height: parent.height
                     width: parent.width /5
 
-                    baseColor: root.colYellow
-                    highlightColor: root.colHighlight
-                    textColor: root.colDarkGrey
-
-                    textSize: sysPopup.textSize
+                    baseColor: Config.colors.primary
+                    highlightColor: Config.colors.highlight_primary
+                    textColor: Config.colors.background
 
                     content: ""
+                    contentFont: Config.fonts.medium
+
                     Process {
                        id: lockProc
                        command: ["hyprlock"]
@@ -135,13 +189,13 @@ Popup {
                     height: parent.height
                     width: parent.width /5
 
-                    baseColor: root.colYellow
-                    highlightColor: root.colHighlight
-                    textColor: root.colDarkGrey
-
-                    textSize: sysPopup.textSize
+                    baseColor: Config.colors.primary
+                    highlightColor: Config.colors.highlight_primary
+                    textColor: Config.colors.background
 
                     content: "󰒲"
+                    contentFont: Config.fonts.medium
+
                     Process {
                        id: suspendProc
                        command: ["systemctl","suspend"]
@@ -156,16 +210,16 @@ Popup {
                     height: parent.height
                     width: parent.width /5
 
-                    baseColor: root.colYellow
-                    highlightColor: root.colHighlight
-                    textColor: root.colDarkGrey
-                    
-                    textSize: sysPopup.textSize
+                    baseColor: Config.colors.primary
+                    highlightColor: Config.colors.highlight_primary
+                    textColor: Config.colors.background
 
                     topRightRadius: 5
                     bottomRightRadius: 5
 
                     content: "󰍃"
+                    contentFont: Config.fonts.medium
+                    
                     onClick: () => { Hyprland.dispatch("exit") }
                 }
             }
