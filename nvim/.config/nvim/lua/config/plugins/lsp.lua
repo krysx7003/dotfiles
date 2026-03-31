@@ -22,11 +22,20 @@ return {
             })
             vim.lsp.enable("lua_ls")
 
+            vim.lsp.config("gopls", {
+                filetypes = { "go" },
+            })
+            vim.lsp.enable("gopls")
+
             vim.lsp.config("clangd", {
                 filetypes = { "cpp" },
             })
             vim.lsp.enable("clangd")
 
+            vim.lsp.config("qmlls", {
+                filetypes = { "qml" },
+            })
+            vim.lsp.enable("qmlls")
 
             vim.diagnostic.config({
                 virtual_text = true,

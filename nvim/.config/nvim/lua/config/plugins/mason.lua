@@ -1,30 +1,32 @@
 return {
-	"mason-org/mason.nvim",
-	dependencies = {
-		"WhoIsSethDaniel/mason-tool-installer.nvim",
-	},
-	config = function()
-		require("mason").setup({
-			ui = {
-				icons = {
-					package_installed = "✓",
-					package_pending = "➜",
-					package_uninstalled = "✗",
-				},
-			},
-		})
+    "mason-org/mason.nvim",
+    dependencies = {
+        "WhoIsSethDaniel/mason-tool-installer.nvim",
+    },
+    config = function()
+        require("mason").setup({
+            ui = {
+                icons = {
+                    package_installed = "✓",
+                    package_pending = "➜",
+                    package_uninstalled = "✗",
+                },
+            },
+        })
 
-		require("mason-tool-installer").setup({
-			ensure_installed = {
-				"lua-language-server",
-				"debugpy",
-				"basedpyright",
-				"ruff",
-				"codelldb",
-				"clangd",
-				"clang-format",
-				-- cpp linter
-			},
-		})
-	end,
+        require("mason-tool-installer").setup({
+            ensure_installed = {
+                "lua-language-server",
+                "debugpy",
+                "basedpyright",
+                "ruff",
+                "codelldb",
+                "clangd",
+                "clang-format",
+                "qmlls",
+                "markdownlint-cli2",
+                -- cpp linter
+            },
+        })
+    end,
 }
