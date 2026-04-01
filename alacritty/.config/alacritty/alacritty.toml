@@ -1,0 +1,28 @@
+[window]
+padding = { x = 0, y = 0 }
+dynamic_padding = true
+decorations = "None"
+
+[colors.primary]
+background = "#373b41"
+
+[font]
+size = 10
+normal.family = "FiraCode Nerd Font"
+bold.family = "FiraCode Nerd Font"
+italic.family = "FiraCode Nerd Font" 
+
+[selection]
+save_to_clipboard = true
+
+[terminal]
+
+[terminal.shell]
+program = "/usr/bin/zsh"
+
+[keyboard]
+bindings = [
+    { key = "F", mods = "Control", chars = "tmux-sessionizer\n" },
+    { key = "Insert", mods = "Shift", action = "Paste" },
+]
+
