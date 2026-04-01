@@ -11,10 +11,9 @@ vim.opt.expandtab = true
 
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.api.nvim_set_hl(0, "LineNr", { fg = "#ffffff" })
 
 vim.opt.signcolumn = "yes"
-
+vim.wo.fillchars = "eob: "
 vim.opt.clipboard = "unnamedplus"
 
 vim.api.nvim_create_autocmd("TextYankPost", {

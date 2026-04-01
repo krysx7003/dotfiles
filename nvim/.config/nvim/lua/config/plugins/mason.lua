@@ -18,6 +18,7 @@ return {
 			ensure_installed = {
 				-- Lua
 				"lua-language-server",
+				"stylua",
 				-- Python
 				"debugpy",
 				"basedpyright",
@@ -35,6 +36,9 @@ return {
 				"goimports",
 				"gopls",
 				"delve",
+				-- Ts/Js
+				"biome",
+				"vtsls",
 			},
 		})
 	end,

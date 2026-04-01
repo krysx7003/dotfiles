@@ -1,5 +1,5 @@
 -- NEAR FUTURE
--- When opening file do not create .nvim
 -- Switch colors when switching tmux modes
+-- Golang support
 -- NOT SO IMPORTANT
 -- Recolor the living shit out of the color sheme nappingfox.lua

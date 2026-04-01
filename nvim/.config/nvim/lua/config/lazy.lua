@@ -21,27 +21,25 @@ vim.opt.runtimepath:prepend(lazypath)
 -- loading lazy.nvim so that mappings are correct.
 -- This is also a good place to setup other settings (vim.opt)
 vim.g.mapleader = " "
--- vim.g.maplocalleader = "\\"
 require("lazy").setup({
 	spec = {
 		{
-			-- "ellisonleao/gruvbox.nvim",
-			"EdenEast/nightfox.nvim",
+			"ellisonleao/gruvbox.nvim",
+			-- "EdenEast/nightfox.nvim",
 			config = function()
-				require("nightfox").setup({
-					options = {
-						transparent = true, -- Normal/NormalNC use terminal background
-					},
-					palettes = {
-						carbonfox = {
-							-- bg1 = "#ffffff", -- main background
-							bg2 = "#ffffff", -- optional secondary bg
-							-- bg3 = "#ffffff",
-							-- bg4 = "#ffffff",
-						},
+				require("gruvbox").setup({
+					overrides = {
+						Normal = { bg = "#373b41" },
+						SignColumn = { bg = "#373b41" },
+						LineNr = { fg = "#c5c8c6", bold = true },
+						CurSearch = { bg = "#282a2e", fg = "#ebb244" },
+						ErrorMsg = { bg = "#373b41", fg = "#fb4934" },
+						-- IncSearch
+						Search = { bg = "#282a2e", fg = "#f0c674" },
+						Substitute = { bg = "#ebb244", fg = "#282a2e" },
 					},
 				})
-				vim.cmd.colorscheme("carbonfox")
+				vim.cmd.colorscheme("gruvbox")
 			end,
 		},
 		{ "nvim-tree/nvim-web-devicons", opt = {} },
