@@ -8,6 +8,12 @@ return {
 			markdown = {
 				"markdownlint-cli2",
 			},
+			typescript = { "biome" },
+			typescriptreact = { "biome" },
+			javascript = { "biome" },
+			javascriptreact = { "biome" },
+			json = { "biome" },
+			jsonc = { "biome" },
 		}
 		vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 			pattern = { "*.py", "*.md" },
