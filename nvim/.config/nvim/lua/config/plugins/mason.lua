@@ -12,6 +12,10 @@ return {
 					package_uninstalled = "✗",
 				},
 			},
+
+			keymaps = {
+				apply_language_filter = "F",
+			},
 		})
 
 		require("mason-tool-installer").setup({
@@ -39,6 +43,7 @@ return {
 				-- Ts/Js
 				"biome",
 				"vtsls",
+				"kotlin-lsp",
 			},
 		})
 	end,

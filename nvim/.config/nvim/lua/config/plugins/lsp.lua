@@ -27,6 +27,20 @@ return {
 			})
 			vim.lsp.enable("gopls")
 
+			-- vim.lsp.config("kotlin-language-server", {
+			-- 	filetypes = { "kotlin" },
+			-- 	cmd = { "kotlin-lsp" },
+			-- })
+			-- vim.lsp.enable("kotlin-language-server")
+
+			vim.lsp.config("kotlin-lsp", {
+				cmd = { "kotlin-lsp", "--stdio" },
+				single_file_support = true,
+				filetypes = { "kotlin" },
+				root_markers = { "build.gradle", "build.gradle.kts", "pom.xml" },
+			})
+			vim.lsp.enable("kotlin-lsp")
+
 			vim.lsp.config("vtsls", {
 				filetypes = { "typescript", "typescriptreact" },
 			})

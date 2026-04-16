@@ -27,6 +27,7 @@ require("lazy").setup({
 			"ellisonleao/gruvbox.nvim",
 			-- "EdenEast/nightfox.nvim",
 			config = function()
+				vim.o.termguicolors = true
 				require("gruvbox").setup({
 					overrides = {
 						Normal = { bg = "#373b41" },
@@ -37,6 +38,11 @@ require("lazy").setup({
 						-- IncSearch
 						Search = { bg = "#282a2e", fg = "#f0c674" },
 						Substitute = { bg = "#ebb244", fg = "#282a2e" },
+						NormalFloat = { bg = "#282a2e", fg = "#c5c8c6" },
+						Pmenu = { bg = "#282a2e", fg = "#c5c8c6" },
+						PmenuSel = { bg = "#f0c674", fg = "#282a2e" },
+						PmenuSbar = { bg = "#282a2e" },
+						PmenuThumb = { bg = "#c5c8c6" },
 					},
 				})
 				vim.cmd.colorscheme("gruvbox")
