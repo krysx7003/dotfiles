@@ -30,18 +30,18 @@ require("lazy").setup({
 				vim.o.termguicolors = true
 				require("gruvbox").setup({
 					overrides = {
-						Normal = { bg = "#373b41" },
-						SignColumn = { bg = "#373b41" },
+						Normal = { bg = "#282a2e" },
+						SignColumn = { bg = "#282a2e" },
 						LineNr = { fg = "#c5c8c6", bold = true },
-						CurSearch = { bg = "#282a2e", fg = "#ebb244" },
-						ErrorMsg = { bg = "#373b41", fg = "#fb4934" },
+						CurSearch = { bg = "#373b41", fg = "#ebb244" },
+						ErrorMsg = { bg = "#282a2e", fg = "#fb4934" },
 						-- IncSearch
-						Search = { bg = "#282a2e", fg = "#f0c674" },
-						Substitute = { bg = "#ebb244", fg = "#282a2e" },
-						NormalFloat = { bg = "#282a2e", fg = "#c5c8c6" },
-						Pmenu = { bg = "#282a2e", fg = "#c5c8c6" },
-						PmenuSel = { bg = "#f0c674", fg = "#282a2e" },
-						PmenuSbar = { bg = "#282a2e" },
+						Search = { bg = "#373b41", fg = "#f0c674" },
+						Substitute = { bg = "#ebb244", fg = "#373b41" },
+						NormalFloat = { bg = "#373b41", fg = "#c5c8c6" },
+						Pmenu = { bg = "#373b41", fg = "#c5c8c6" },
+						PmenuSel = { bg = "#f0c674", fg = "#373b41" },
+						PmenuSbar = { bg = "#373b41" },
 						PmenuThumb = { bg = "#c5c8c6" },
 					},
 				})
